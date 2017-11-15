@@ -8,14 +8,17 @@ __author__ = 'regu0004'
 
 class Client(object):
     # TODO specify the correct path
-    ROOT_PATH = "."
+    ROOT_PATH = "/root/openid_course"
     # TODO specify the correct URL
     ISSUER = "https://example.com"
 
     def __init__(self, client_metadata):
         self.client = OIDCClient(client_authn_method=CLIENT_AUTHN_METHOD)
 
-        # TODO get the provider configuration information
+        # DONE get the provider configuration information
+        self.provider_info = self.client.provider_config('https://op1.test.inacademia.org')
+        print(self.provider_info)
+
         # TODO register with the provider using the client_metadata
 
     def authenticate(self, session):

@@ -8,19 +8,19 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.nimbusds.oauth2.sdk.ErrorObject;
+import com.nimbusds.oauth2.sdk.*;
 import com.nimbusds.oauth2.sdk.client.ClientRegistrationErrorResponse;
 import com.nimbusds.oauth2.sdk.client.ClientRegistrationResponse;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+import com.nimbusds.openid.connect.sdk.Nonce;
 import com.nimbusds.openid.connect.sdk.rp.*;
 import spark.Request;
 import spark.Response;
 import spark.Session;
 
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
-import com.nimbusds.oauth2.sdk.AuthorizationCode;
-import com.nimbusds.oauth2.sdk.ParseException;
-import com.nimbusds.oauth2.sdk.SerializeException;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.util.JSONObjectUtils;
 import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
@@ -34,11 +34,12 @@ public class Client {
 
 	private OIDCClientInformation clientInformation;
 	private OIDCProviderMetadata providerMetadata;
+    private OIDCClientMetadata clientMetadata;
 
 	public Client(String clientMetadataString)
 			throws ParseException, URISyntaxException, IOException,
 			SerializeException {
-		OIDCClientMetadata clientMetadata = OIDCClientMetadata
+		clientMetadata = OIDCClientMetadata
 				.parse(JSONObjectUtils.parse(clientMetadataString));
 
         // DONE get the provider configuration information
@@ -57,7 +58,8 @@ public class Client {
         OIDCClientMetadata metadata = OIDCClientMetadata.parse(JSONObjectUtils.parse(jsonMetadata));
 
         // Make registration request
-        OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(providerMetadata.getRegistrationEndpointURI(), metadata, null);
+        OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(
+                providerMetadata.getRegistrationEndpointURI(), metadata, null);
         HTTPResponse regHTTPResponse = registrationRequest.toHTTPRequest().send();
 
         // Parse and check response
@@ -72,9 +74,20 @@ public class Client {
 		// session object that can be used to store state between requests
 		Session session = req.session();
 
-		// TODO make authentication request
+		// DONE make authentication request
+        State state = new State();
+        Nonce nonce = new Nonce();
+        Scope scope = Scope.parse("openid");
 
-		String login_url = null; // TODO insert the redirect URL
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+                providerMetadata.getAuthorizationEndpointURI(),
+                new ResponseType(ResponseType.Value.CODE),
+                scope, clientInformation.getID(), new URI("http://localhost:8090/code_flow_callback"), state, nonce);
+
+        URI authReqURI = authenticationRequest.toURI();
+
+        // DONE: insert the redirect URL
+        String login_url = authReqURI.toString();
 
 		res.redirect(login_url);
 		return null;

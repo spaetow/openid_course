@@ -7,9 +7,9 @@ __author__ = 'regu0004'
 
 
 class Client(object):
-    # TODO specify the correct path
+    # DONE specify the correct path
     ROOT_PATH = "/root/openid_course"
-    # TODO specify the correct URL
+    # DONE specify the correct URL
     ISSUER = "https://example.com"
 
     def __init__(self, client_metadata):
@@ -20,7 +20,9 @@ class Client(object):
 
         # DONE register with the provider using the client_metadata
         args = {
-            "redirect_uris": ['http://localhost:8090/code_flow_callback'],
+            "redirect_uris": ['http://alex.inf.um.es:8090/code_flow_callback',
+                              'http://alex.inf.um.es:8090/implicit_flow_callback'],
+            "response_types": ["code", "id_token token"],
             "contacts": ["alex@um.es"]
         }
 
@@ -37,14 +39,16 @@ class Client(object):
         session["nonce"] = rndstr()
         args = {
             "client_id": self.client.client_id,
-            "response_type": "code",
+           # "response_type": "code",
+            "response_type": ["id_token", "token"],
             "scope": ["email openid"],
             "nonce": session["nonce"],
-            "redirect_uri": self.client.registration_response["redirect_uris"][0],
+            "redirect_uri": self.client.registration_response["redirect_uris"][1],
             "state": session["state"]
         }
 
         auth_req = self.client.construct_AuthorizationRequest(request_args=args)
+        print(auth_req)
 
         # DONE insert the redirect URL
         login_url = auth_req.request(self.client.authorization_endpoint)
@@ -84,15 +88,25 @@ class Client(object):
         return success_page(access_code, access_token, id_token_claims, userinfo)
 
     def implicit_flow_callback(self, auth_response, session):
-        # TODO parse the authentication response
-        # TODO validate the 'state' parameter
-        # TODO validate the ID Token according to the OpenID Connect spec (sec 3.2.2.11.)
+        # DONE parse the authentication response
+        from oic.oic.message import AuthorizationResponse
+        aresp = self.client.parse_response(AuthorizationResponse, info=auth_response, sformat="urlencoded")
 
-        # TODO set the appropriate values
-        access_code = None
-        access_token = None
-        id_token_claims = None
-        return success_page(access_code, access_token, id_token_claims, None)
+        # DONE validate the 'state' parameter
+        assert aresp['state'] == session['state']
+
+        # DONE? validate the ID Token according to the OpenID Connect spec (sec 3.1.3.7.)
+        assert(session['nonce'] == aresp['id_token']['nonce'])
+
+        # DONE set the appropriate values
+        userinfo = self.client.do_user_info_request(state=aresp["state"])
+        print(userinfo)
+
+        access_token = aresp['access_token']
+        id_token_claims = aresp['id_token']
+        userinfo = userinfo
+
+        return success_page(None, access_token, id_token_claims, userinfo)
 
 
 def success_page(auth_code, access_token, id_token_claims, userinfo):

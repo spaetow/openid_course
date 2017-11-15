@@ -38,7 +38,7 @@ class Client(object):
         args = {
             "client_id": self.client.client_id,
             "response_type": "code",
-            "scope": ["openid"],
+            "scope": ["email openid"],
             "nonce": session["nonce"],
             "redirect_uri": self.client.registration_response["redirect_uris"][0],
             "state": session["state"]
@@ -52,18 +52,35 @@ class Client(object):
         return login_url
 
     def code_flow_callback(self, auth_response, session):
-        # TODO parse the authentication response
-        # TODO validate the 'state' parameter
+        # DONE parse the authentication response
+        from oic.oic.message import AuthorizationResponse
+        aresp = self.client.parse_response(AuthorizationResponse, info=auth_response, sformat="urlencoded")
 
-        # TODO make token request
-        # TODO validate the ID Token according to the OpenID Connect spec (sec 3.1.3.7.)
-        # TODO make userinfo request
+        # DONE validate the 'state' parameter
+        assert aresp['state'] == session['state']
 
-        # TODO set the appropriate values
-        access_code = None
-        access_token = None
-        id_token_claims = None
-        userinfo = None
+        # DONE make token request
+        args = {
+            "code": aresp["code"]
+        }
+
+        resp = self.client.do_access_token_request(state=aresp["state"],
+                                                   request_args=args,
+                                                   authn_method="client_secret_basic")
+
+
+        # DONE? validate the ID Token according to the OpenID Connect spec (sec 3.1.3.7.)
+        assert(session['nonce'] == resp['id_token']['nonce'])
+
+        # DONE make userinfo request
+        userinfo = self.client.do_user_info_request(state=aresp["state"])
+
+        # DONE set the appropriate values
+        access_code = aresp['code']
+        access_token = resp['access_token']
+        id_token_claims = resp['id_token']
+        userinfo = userinfo
+
         return success_page(access_code, access_token, id_token_claims, userinfo)
 
     def implicit_flow_callback(self, auth_response, session):

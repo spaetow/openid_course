@@ -95,8 +95,8 @@ public class Client {
 
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
                 providerMetadata.getAuthorizationEndpointURI(),
-                new ResponseType(ResponseType.Value.CODE),
-                scope, clientInformation.getID(), new URI("http://ojou-java.lxc:8090/code_flow_callback"), state, nonce);
+                new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
+                scope, clientInformation.getID(), new URI("http://ojou-java.lxc:8090/implicit_flow_callback"), state, nonce);
 
         URI authReqURI = authenticationRequest.toURI();
 
@@ -240,16 +240,57 @@ public class Client {
         // Callback redirect URI
         String url = req.url() + "#" + req.queryParams("url_fragment");
 
-        // TODO parse authentication response from url
-        // TODO validate the 'state' parameter
+        // DONE parse authentication response from url
+        AuthenticationResponse authResp = null;
+        try {
+            authResp = AuthenticationResponseParser.parse(new URI(url));
+        } catch (ParseException | URISyntaxException e) {
+            throw new IOException("Parse error");
+        }
 
-        // TODO validate the ID Token according to the OpenID Connect spec (sec 3.2.2.11.)
+        if (authResp instanceof AuthenticationErrorResponse) {
+            ErrorObject error = ((AuthenticationErrorResponse) authResp).getErrorObject();
+            throw new IOException("Received error response");
+        }
 
-        // TODO set the appropriate values
-        AuthorizationCode authCode = null;
-        AccessToken accessToken = null;
-        String parsedIdToken = null;
+        AuthenticationSuccessResponse successResponse = (AuthenticationSuccessResponse) authResp;
+
+        // DONE validate the 'state' parameter
+        if (!successResponse.getState().equals(req.session().attribute("state"))) {
+            throw new IOException("Invalid state!");
+        }
+
+        AuthorizationCode authCode = successResponse.getAuthorizationCode();
+        AccessToken accessToken = successResponse.getAccessToken();
+        String parsedIdToken = successResponse.getIDToken().getParsedString();
+
+        // DONE validate the ID Token according to the OpenID Connect spec (sec 3.1.3.7.)
         ReadOnlyJWTClaimsSet idTokenClaims = null;
+        try {
+            idTokenClaims = verifyIdToken(successResponse.getIDToken(), providerMetadata);
+        } catch (ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+
+        // DONE make userinfo request
+        UserInfoRequest userInfoReq = new UserInfoRequest(
+                providerMetadata.getUserInfoEndpointURI(), (BearerAccessToken) accessToken);
+
+        HTTPResponse userInfoHTTPResp = null;
+        UserInfoResponse userInfoResponse = null;
+        try {
+            userInfoHTTPResp = userInfoReq.toHTTPRequest().send();
+            userInfoResponse = UserInfoResponse.parse(userInfoHTTPResp);
+        } catch (SerializeException | IOException | ParseException e) {
+            throw new IOException(e.getMessage());
+        }
+
+        if (userInfoResponse instanceof UserInfoErrorResponse) {
+            ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
+            throw new IOException("Received error response: " + error.toString());
+        }
+
+        // DONE set the appropriate values
 
         return WebServer.successPage(authCode, accessToken, parsedIdToken,
                 idTokenClaims, null);

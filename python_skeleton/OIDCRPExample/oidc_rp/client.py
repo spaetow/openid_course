@@ -20,8 +20,8 @@ class Client(object):
 
         # DONE register with the provider using the client_metadata
         args = {
-            "redirect_uris": ['https://example.com/rp/authz_cb'],
-            "contacts": ["foo@example.com"]
+            "redirect_uris": ['http://localhost:8090/code_flow_callback'],
+            "contacts": ["alex@um.es"]
         }
 
         registration_response = self.client.register(provider_info["registration_endpoint"], **args)
@@ -29,9 +29,26 @@ class Client(object):
     def authenticate(self, session):
         # Use the session object to store state between requests
 
-        # TODO make authentication request
+        # DONE make authentication request
+        from oic import rndstr
+        from oic.utils.http_util import Redirect
 
-        login_url = None  # TODO insert the redirect URL
+        session["state"] = rndstr()
+        session["nonce"] = rndstr()
+        args = {
+            "client_id": self.client.client_id,
+            "response_type": "code",
+            "scope": ["openid"],
+            "nonce": session["nonce"],
+            "redirect_uri": self.client.registration_response["redirect_uris"][0],
+            "state": session["state"]
+        }
+
+        auth_req = self.client.construct_AuthorizationRequest(request_args=args)
+
+        # DONE insert the redirect URL
+        login_url = auth_req.request(self.client.authorization_endpoint)
+
         return login_url
 
     def code_flow_callback(self, auth_response, session):

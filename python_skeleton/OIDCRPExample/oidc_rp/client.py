@@ -16,10 +16,15 @@ class Client(object):
         self.client = OIDCClient(client_authn_method=CLIENT_AUTHN_METHOD)
 
         # DONE get the provider configuration information
-        self.provider_info = self.client.provider_config('https://op1.test.inacademia.org')
-        print(self.provider_info)
+        provider_info = self.client.provider_config('https://op1.test.inacademia.org')
 
-        # TODO register with the provider using the client_metadata
+        # DONE register with the provider using the client_metadata
+        args = {
+            "redirect_uris": ['https://example.com/rp/authz_cb'],
+            "contacts": ["foo@example.com"]
+        }
+
+        registration_response = self.client.register(provider_info["registration_endpoint"], **args)
 
     def authenticate(self, session):
         # Use the session object to store state between requests

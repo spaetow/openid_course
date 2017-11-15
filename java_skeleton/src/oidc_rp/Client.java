@@ -1,10 +1,18 @@
 package oidc_rp;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.nimbusds.oauth2.sdk.ErrorObject;
+import com.nimbusds.oauth2.sdk.client.ClientRegistrationErrorResponse;
+import com.nimbusds.oauth2.sdk.client.ClientRegistrationResponse;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.openid.connect.sdk.rp.*;
 import spark.Request;
 import spark.Response;
 import spark.Session;
@@ -17,13 +25,11 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.util.JSONObjectUtils;
 import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
-import com.nimbusds.openid.connect.sdk.rp.OIDCClientInformation;
-import com.nimbusds.openid.connect.sdk.rp.OIDCClientMetadata;
 
 public class Client {
-	// TODO specify the correct path
-	public static Path ROOT_PATH = Paths.get(".");
-	// TODO specify the correct URL
+	// DONE specify the correct path
+	public static Path ROOT_PATH = Paths.get("/home/alex/openid_course");
+	// DONE specify the correct URL
 	public static String ISSUER = "https://example.com";
 
 	private OIDCClientInformation clientInformation;
@@ -35,8 +41,30 @@ public class Client {
 		OIDCClientMetadata clientMetadata = OIDCClientMetadata
 				.parse(JSONObjectUtils.parse(clientMetadataString));
 
-        // TODO get the provider configuration information
-        // TODO register with the provider using the clientMetadata
+        // DONE get the provider configuration information
+		URI issuerURI = new URI("https://op1.test.inacademia.org");
+        URL providerConfigurationURL = issuerURI.resolve("/.well-known/openid-configuration").toURL();
+            InputStream stream = providerConfigurationURL.openStream();
+        // Read all data from URL
+        String providerInfo = null;
+        try (java.util.Scanner s = new java.util.Scanner(stream)) {
+            providerInfo = s.useDelimiter("\\A").hasNext() ? s.next() : "";
+        }
+        providerMetadata = OIDCProviderMetadata.parse(providerInfo);
+
+        // DONE register with the provider using the clientMetadata
+        String jsonMetadata = clientMetadataString;
+        OIDCClientMetadata metadata = OIDCClientMetadata.parse(JSONObjectUtils.parse(jsonMetadata));
+
+        // Make registration request
+        OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(providerMetadata.getRegistrationEndpointURI(), metadata, null);
+        HTTPResponse regHTTPResponse = registrationRequest.toHTTPRequest().send();
+
+        // Parse and check response
+        ClientRegistrationResponse registrationResponse = OIDCClientRegistrationResponseParser.parse(regHTTPResponse);
+
+        // Store client information from OP
+        clientInformation = ((OIDCClientInformationResponse)registrationResponse).getOIDCClientInformation();
 	}
 
 	public String authenticate(Request req, Response res)

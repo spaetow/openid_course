@@ -1,11 +1,11 @@
-This document describes how to setup the Android AppAuth APP [``mod_auth_openidc``](https://github.com/pingidentity/mod_auth_openidc).
+This document describes how to setup the Android  [``AppAuth``](https://github.com/openid/AppAuth-Android) application.
 
 # Prerequisites
 * Android Studio 3.0
 
 # Get AppAuth code
 ```
-git clone https://github.com/openid/AppAuth-Android.git
+git clone --branch 0.7.0 https://github.com/openid/AppAuth-Android.git
 ```
 
 # Setting up Android Studio
@@ -23,10 +23,10 @@ git clone https://github.com/openid/AppAuth-Android.git
         1. Select hardware graphics acceleration.
 
 # App configuration
-1. Check https://github.com/openid/AppAuth-Android/tree/0.7.0/app for
+1. Check https://github.com/openid/AppAuth-Android/blob/0.7.0/app/README.md for
     instructions on how to tune the configuration file to connect with an OP.
     No code changes are required for this one.
-1. Check https://github.com/openid/AppAuth-Android for advanced instructions
+1. Check https://github.com/openid/AppAuth-Android/blob/0.7.0/README.md for advanced instructions
     if you want to change App behaviour (such as using a Client password,
     or a flow different than `CODE`. These might require non-trivial
     changes to the code.

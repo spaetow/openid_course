@@ -5,7 +5,7 @@ This document describes how to setup the provided Python code
 
 * Python 2.7 or 3.4.3
 * Homebrew if using Mac
-* PyCharm Community Edition: https://www.jetbrains.com/pycharm/download/
+* PyCharm Community Edition: https://www.jetbrains.com/pycharm/download/ (optional)
 
 # Setup
 
@@ -31,7 +31,7 @@ On Ubuntu:
 ## Project setup
 
 ### Optional pre-setup
-1. Setup a [virtual environment](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
+1. Setup a [virtual environment](http://docs.python-guide.org/en/latest/dev/virtualenvs/). (You can do it directly from pyCharm)
 2. Activate the new virtual environment.
 
 ### Code setup
@@ -42,7 +42,7 @@ On Ubuntu:
      ``index.html``, etc.) in ``Client.ROOT_PATH`` (in ``oidc_rp/client.py``).
    1. Run the Relying Party (RP): ``python runner.py`` (from the ``OIDCRPExample/`` directory).
    1. Verify the RP is running at [http://localhost:8090](http://localhost:8090) **using Firefox**
-     (Google Chrome has some issues with CherryPy's sessions).
+     (Google Chrome has some issues with CherryPy's sessions). With recent versions of Chrome there seem not to be a problem.
   
 1. Start adding to the skeleton code:
    1. The missing parts are marked with ``TODO`` in ``oidc_rp/client.py``.

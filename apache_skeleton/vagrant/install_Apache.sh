@@ -7,7 +7,7 @@ sudo apt-get update
 sudo apt-get install -y apache2
 
 # Install dependencies for building mod_auth_openidc
-sudo apt-get install -y apache2-dev libssl-dev libcurl4-openssl-dev libjansson-dev libpcre3-dev autoconf
+sudo apt-get install -y apache2-dev libssl-dev libcurl4-openssl-dev libjansson-dev libpcre3-dev autoconf pgk-config
 
 # Fetch mod_auth_openidc
 wget https://github.com/pingidentity/mod_auth_openidc/archive/${MOD_AUTH_OPENIDC_COMMIT}.tar.gz -O mod_auth_openidc.tar.gz

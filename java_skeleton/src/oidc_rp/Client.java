@@ -39,7 +39,7 @@ import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 public class Client {
     // DONE specify the correct path
-    public static Path ROOT_PATH = Paths.get("/home/alex/openid_course");
+    public static Path ROOT_PATH = Paths.get("/root/openid_course");
     // DONE specify the correct URL
     public static String ISSUER = "https://example.com";
 
@@ -48,10 +48,8 @@ public class Client {
     private OIDCClientMetadata clientMetadata;
 
     public Client(String clientMetadataString)
-            throws ParseException, URISyntaxException, IOException,
-            SerializeException {
-        clientMetadata = OIDCClientMetadata
-                .parse(JSONObjectUtils.parse(clientMetadataString));
+            throws ParseException, URISyntaxException, IOException, SerializeException {
+        clientMetadata = OIDCClientMetadata.parse(JSONObjectUtils.parse(clientMetadataString));
 
         // DONE get the provider configuration information
         URI issuerURI = new URI("https://op1.test.inacademia.org");
@@ -65,12 +63,8 @@ public class Client {
         providerMetadata = OIDCProviderMetadata.parse(providerInfo);
 
         // DONE register with the provider using the clientMetadata
-        String jsonMetadata = clientMetadataString;
-        OIDCClientMetadata metadata = OIDCClientMetadata.parse(JSONObjectUtils.parse(jsonMetadata));
-
-        // Make registration request
         OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(
-                providerMetadata.getRegistrationEndpointURI(), metadata, null);
+                providerMetadata.getRegistrationEndpointURI(), clientMetadata, null);
         HTTPResponse regHTTPResponse = registrationRequest.toHTTPRequest().send();
 
         // Parse and check response
@@ -96,7 +90,9 @@ public class Client {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
                 providerMetadata.getAuthorizationEndpointURI(),
                 new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
-                scope, clientInformation.getID(), new URI("http://ojou-java.lxc:8090/implicit_flow_callback"), state, nonce);
+//                new ResponseType(ResponseType.Value.CODE),
+                scope, clientInformation.getID(), new URI("http://ojou-python.lxc:8090/implicit_flow_callback"), state, nonce);
+//                scope, clientInformation.getID(), new URI("http://ojou-python.lxc:8090/code_flow_callback"), state, nonce);
 
         URI authReqURI = authenticationRequest.toURI();
 
@@ -183,7 +179,7 @@ public class Client {
         TokenRequest tokenReq = new TokenRequest(
                 providerMetadata.getTokenEndpointURI(),
                 new ClientSecretBasic(clientInformation.getID(), clientInformation.getSecret()),
-                new AuthorizationCodeGrant(authCode, new URI("http://ojou-java.lxc:8090/code_flow_callback")));
+                new AuthorizationCodeGrant(authCode, new URI("http://ojou-python.lxc:8090/code_flow_callback")));
 
         HTTPResponse tokenHTTPResp = null;
         TokenResponse tokenResponse = null;

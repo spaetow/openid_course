@@ -85,14 +85,19 @@ public class Client {
         session.attribute("state", state);
         session.attribute("nonce", nonce);
 
-        Scope scope = Scope.parse("openid email");
+        Scope scope = Scope.parse("openid email profile");
 
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
                 providerMetadata.getAuthorizationEndpointURI(),
-                new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
-//                new ResponseType(ResponseType.Value.CODE),
-                scope, clientInformation.getID(), new URI("http://ojou-python.lxc:8090/implicit_flow_callback"), state, nonce);
-//                scope, clientInformation.getID(), new URI("http://ojou-python.lxc:8090/code_flow_callback"), state, nonce);
+
+                // Uncomment the following for CODE flow
+                new ResponseType(ResponseType.Value.CODE),
+                scope, clientInformation.getID(), new URI("http://localhost:8090/code_flow_callback"), state, nonce);
+
+                // Uncomment the following for Implicit flow
+                //new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
+                //scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
+
 
         URI authReqURI = authenticationRequest.toURI();
 
@@ -179,7 +184,7 @@ public class Client {
         TokenRequest tokenReq = new TokenRequest(
                 providerMetadata.getTokenEndpointURI(),
                 new ClientSecretBasic(clientInformation.getID(), clientInformation.getSecret()),
-                new AuthorizationCodeGrant(authCode, new URI("http://ojou-python.lxc:8090/code_flow_callback")));
+                new AuthorizationCodeGrant(authCode, new URI("http://localhost:8090/code_flow_callback")));
 
         HTTPResponse tokenHTTPResp = null;
         TokenResponse tokenResponse = null;

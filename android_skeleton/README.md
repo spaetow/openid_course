@@ -1,4 +1,4 @@
-This document describes how to setup the Android AppAuth APP [``mod_auth_openidc``](https://github.com/pingidentity/mod_auth_openidc).
+This document describes how to setup the Android  [``AppAuth APP``](https://github.com/openid/AppAuth-Android).
 
 # Prerequisites
 * Android Studio 3.0

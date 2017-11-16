@@ -1,8 +1,8 @@
 {
   "application_type": "web",
   "redirect_uris": [
-    "http://ojou-python.lxc:8090/code_flow_callback",
-    "http://ojou-python.lxc:8090/implicit_flow_callback"
+    "http://localhost:8090/code_flow_callback",
+    "http://localhost:8090/implicit_flow_callback"
   ],
   "response_types": [
     "code",

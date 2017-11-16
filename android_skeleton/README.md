@@ -5,7 +5,7 @@ This document describes how to setup the Android  [``AppAuth APP``](https://gith
 
 # Get AppAuth code
 ```
-git clone https://github.com/openid/AppAuth-Android.git
+git clone --branch 0.7.0 https://github.com/openid/AppAuth-Android.git
 ```
 
 # Setting up Android Studio

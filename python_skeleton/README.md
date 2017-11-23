@@ -3,7 +3,7 @@ This document describes how to setup the provided Python code
 
 # Prerequisites
 
-* Python 2.7 or 3.4.3
+* Python 2.7 or ~~3.5.2~~ (Does not seem to work)
 * Homebrew if using Mac
 * PyCharm Community Edition: https://www.jetbrains.com/pycharm/download/ (optional)
 

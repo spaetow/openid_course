@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.Scanner;
 
 import com.nimbusds.jose.JOSEException;
@@ -18,9 +19,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.oauth2.sdk.*;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
+import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.client.ClientRegistrationErrorResponse;
 import com.nimbusds.oauth2.sdk.client.ClientRegistrationResponse;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.*;
@@ -50,7 +53,6 @@ public class Client {
     public Client(String clientMetadataString)
             throws ParseException, URISyntaxException, IOException, SerializeException {
         clientMetadata = OIDCClientMetadata.parse(JSONObjectUtils.parse(clientMetadataString));
-
         // DONE get the provider configuration information
         URI issuerURI = new URI("https://op1.test.inacademia.org");
         URL providerConfigurationURL = issuerURI.resolve("/.well-known/openid-configuration").toURL();
@@ -86,22 +88,40 @@ public class Client {
         session.attribute("state", state);
         session.attribute("nonce", nonce);
 
-        Scope scope = Scope.parse("openid email profile");
+        Scope scope = Scope.parse("openid email");
 
+        // Uncomment the following for CODE flow
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
-            providerMetadata.getAuthorizationEndpointURI(),
+                providerMetadata.getAuthorizationEndpointURI(),
+                new ResponseType(ResponseType.Value.CODE),
+                scope, clientInformation.getID(), new URI("http://localhost:8090/code_flow_callback"), state, nonce);
 
-            // Uncomment the following for CODE flow
-            new ResponseType(ResponseType.Value.CODE),
-            scope, clientInformation.getID(), new URI("http://localhost:8090/code_flow_callback"), state, nonce);
+        // Uncomment the following for Implicit flow
+//        AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+//                providerMetadata.getAuthorizationEndpointURI(),
+//                new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
+//                scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
 
-            // Uncomment the following for Implicit flow
-//            new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
-//            scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
+        // Uncomment the following for Implicit flow
+//        AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+//                providerMetadata.getAuthorizationEndpointURI(),
+//                new ResponseType(ResponseType.Value.CODE, new ResponseType.Value("id_token")),
+//                scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
 
-            // Uncomment the following for Implicit flow
-//            new ResponseType(ResponseType.Value.CODE, new ResponseType.Value("id_token")),
-//            scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
+        // Uncomment the following for COde flow with claims
+//        ClaimsRequest claims = new ClaimsRequest();
+//        claims.addUserInfoClaim("given_name");
+//        claims.addUserInfoClaim("family_name");
+//        claims.addUserInfoClaim("nickname");
+//        claims.addIDTokenClaim("email");
+//        claims.addIDTokenClaim("phone_number");
+//        AuthenticationRequest authenticationRequest = new AuthenticationRequest.Builder(
+//                new ResponseType("code"), scope, clientInformation.getID(),
+//                URI.create("http://localhost:8090/code_flow_callback"))
+//                .state(state)
+//                .claims(claims)
+//                .endpointURI(providerMetadata.getAuthorizationEndpointURI())
+//                .build();
 
         URI authReqURI = authenticationRequest.toURI();
 

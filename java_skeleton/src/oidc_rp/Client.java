@@ -88,16 +88,19 @@ public class Client {
         Scope scope = Scope.parse("openid email profile");
 
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
-                providerMetadata.getAuthorizationEndpointURI(),
+            providerMetadata.getAuthorizationEndpointURI(),
 
-                // Uncomment the following for CODE flow
-                new ResponseType(ResponseType.Value.CODE),
-                scope, clientInformation.getID(), new URI("http://localhost:8090/code_flow_callback"), state, nonce);
+            // Uncomment the following for CODE flow
+            new ResponseType(ResponseType.Value.CODE),
+            scope, clientInformation.getID(), new URI("http://localhost:8090/code_flow_callback"), state, nonce);
 
-                // Uncomment the following for Implicit flow
-                //new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
-                //scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
+            // Uncomment the following for Implicit flow
+//            new ResponseType(new ResponseType.Value("id_token"), ResponseType.Value.TOKEN),
+//            scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
 
+            // Uncomment the following for Implicit flow
+//            new ResponseType(ResponseType.Value.CODE, new ResponseType.Value("id_token")),
+//            scope, clientInformation.getID(), new URI("http://localhost:8090/implicit_flow_callback"), state, nonce);
 
         URI authReqURI = authenticationRequest.toURI();
 
@@ -237,7 +240,7 @@ public class Client {
     }
 
     public String implicitFlowCallback(Request req, Response res)
-            throws IOException {
+            throws IOException, URISyntaxException {
         // Callback redirect URI
         String url = req.url() + "#" + req.queryParams("url_fragment");
 
@@ -273,6 +276,32 @@ public class Client {
             throw new IOException(e.getMessage());
         }
 
+        // Uncommment the following for Hybrid flow
+/*        if (accessToken == null) {
+            // DONE make token request
+            TokenRequest tokenReq = new TokenRequest(
+                    providerMetadata.getTokenEndpointURI(),
+                    new ClientSecretBasic(clientInformation.getID(), clientInformation.getSecret()),
+                    new AuthorizationCodeGrant(authCode, new URI("http://localhost:8090/implicit_flow_callback")));
+
+            HTTPResponse tokenHTTPResp = null;
+            TokenResponse tokenResponse = null;
+            try {
+                tokenHTTPResp = tokenReq.toHTTPRequest().send();
+                tokenResponse = OIDCTokenResponseParser.parse(tokenHTTPResp);
+            } catch (SerializeException | IOException | ParseException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            if (tokenResponse instanceof TokenErrorResponse) {
+                ErrorObject error = ((TokenErrorResponse) tokenResponse).getErrorObject();
+                throw new IOException("Received error token response: " + error.toString());
+            }
+            OIDCAccessTokenResponse accessTokenResponse = (OIDCAccessTokenResponse) tokenResponse;
+            accessToken = accessTokenResponse.getAccessToken();
+        }*/
+
+
         // DONE make userinfo request
         UserInfoRequest userInfoReq = new UserInfoRequest(
                 providerMetadata.getUserInfoEndpointURI(), (BearerAccessToken) accessToken);
@@ -292,8 +321,7 @@ public class Client {
         }
 
         // DONE set the appropriate values
-
         return WebServer.successPage(authCode, accessToken, parsedIdToken,
-                idTokenClaims, null);
+                idTokenClaims, (UserInfoSuccessResponse) userInfoResponse);
     }
 }

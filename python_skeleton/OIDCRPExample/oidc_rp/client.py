@@ -42,6 +42,10 @@ class Client(object):
             # "response_type": ["id_token", "token"],
             # "redirect_uri": self.client.registration_response["redirect_uris"][1],
 
+            # Uncomment these two to use HYBRID flow
+            # "response_type": ["code", "id_token"],
+            # "redirect_uri": self.client.registration_response["redirect_uris"][1],
+
             "scope": ["email openid"],
             "nonce": session["nonce"],
             "state": session["state"]
@@ -92,13 +96,20 @@ class Client(object):
         assert (session['nonce'] == aresp['id_token']['nonce'])
 
         # DONE set the appropriate values
+        # This is require for the hybrid flow
+        if aresp.get('code'):
+            args = {"code": aresp["code"]}
+            resp = self.client.do_access_token_request(state=aresp["state"], request_args=args,
+                                                       authn_method="client_secret_basic")
+
         userinfo = self.client.do_user_info_request(state=aresp["state"])
 
-        access_token = aresp['access_token']
+        access_code = aresp.get('code')
+        access_token = aresp.get('access_token') or resp.get('access_token')
         id_token_claims = aresp['id_token']
         userinfo = userinfo
 
-        return success_page(None, access_token, id_token_claims, userinfo)
+        return success_page(access_code, access_token, id_token_claims, userinfo)
 
 
 def success_page(auth_code, access_token, id_token_claims, userinfo):

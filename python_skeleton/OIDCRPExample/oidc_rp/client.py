@@ -22,6 +22,9 @@ class Client(object):
         # DONE get the provider configuration information
         provider_info = self.client.provider_config('https://op1.test.inacademia.org')
 
+        # Uncomment for signed userinfo
+        client_metadata.update({"userinfo_signed_response_alg": "RS256"})
+
         # DONE register with the provider using the client_metadata
         # Uncomment for dynamic registration
         self.client.register(provider_info["registration_endpoint"], **client_metadata)
@@ -32,6 +35,7 @@ class Client(object):
         # client_metadata.update(info)
         # client_reg = RegistrationResponse(**client_metadata)
         # self.client.store_registration_info(client_reg)
+
 
     def authenticate(self, session):
         # Use the session object to store state between requests
@@ -75,7 +79,7 @@ class Client(object):
             #         },
             #         "phone_number": None,
             #     }
-            # }
+            # },
         }
 
         auth_req = self.client.construct_AuthorizationRequest(request_args=args)

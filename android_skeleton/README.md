@@ -17,7 +17,7 @@ sudo apt-get install lib32z1 lib32ncurses5 lib32stdc++6 libc6-x32
 ```
 1. Execute Android Studio
 1. Choose `Open existing project` and select the AppAuth root folder
-1. Install all the required dependencies as requested by the IDE (there will be many)
+1. Install all the required dependencies as requested by the IDE (there will be many). IMPORTANT: DO NOT UPGRADE TO GRADLE 4, OR YOU WILL NEED TO DOWNLOAD EVERYTHING AGAIN AND FIX THINGS.
 1. Run the application. Two options:
     1. With your physical device
         * No major problems are expected with this one.

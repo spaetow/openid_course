@@ -14,7 +14,7 @@ class Client(object):
     # DONE specify the correct path
     ROOT_PATH = "../../"
     # DONE specify the correct URL
-    ISSUER = "https://localhost"
+    ISSUER = "http://localhost"
 
     def __init__(self, client_metadata):
         self.client = OIDCClient(client_authn_method=CLIENT_AUTHN_METHOD)

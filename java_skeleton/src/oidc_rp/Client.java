@@ -39,9 +39,9 @@ import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 public class Client {
     // DONE specify the correct path
-    public static Path ROOT_PATH = Paths.get("/root/openid_course");
+    public static Path ROOT_PATH = Paths.get("/home/alex/openid_course");
     // DONE specify the correct URL
-    public static String ISSUER = "https://example.com";
+    public static String ISSUER = "http://localhost";
 
     private OIDCClientInformation clientInformation;
     private OIDCProviderMetadata providerMetadata;

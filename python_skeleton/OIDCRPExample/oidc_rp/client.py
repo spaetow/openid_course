@@ -56,7 +56,26 @@ class Client(object):
 
             "scope": ["email openid"],
             "nonce": session["nonce"],
-            "state": session["state"]
+            "state": session["state"],
+
+            # Uncomment to request claims
+            # "claims": {
+            #     "userinfo": {
+            #         "given_name": {
+            #             "essential": True,
+            #         },
+            #         "family_name": {
+            #             "essential": True,
+            #         },
+            #         "nickname": None
+            #     },
+            #     "id_token": {
+            #         "email": {
+            #             "essential": True,
+            #         },
+            #         "phone_number": None,
+            #     }
+            # }
         }
 
         auth_req = self.client.construct_AuthorizationRequest(request_args=args)

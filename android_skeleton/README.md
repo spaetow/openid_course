@@ -11,9 +11,9 @@ git clone --branch 0.7.0 https://github.com/openid/AppAuth-Android.git
 # Setting up Android Studio
 1. Download Android Studio from https://developer.android.com/studio/index.html
 1. Follow the instructions from https://developer.android.com/studio/install.html
-   * Note: The instructions indicate that if you are using Ubuntu 64bit, you should install a series of packages, but the names are wrong. It should say:
+   * Note: The instructions indicate that if you are using Ubuntu 64bit, you should install a series of packages, but the names are wrong for Ubuntu 16.04. It should say:
 ```
-sudo apt-get install lib32z1 lib32ncurses5 lib32stdc++6
+sudo apt-get install lib32z1 lib32ncurses5 lib32stdc++6 libc6-x32
 ```
 1. Execute Android Studio
 1. Choose `Open existing project` and select the AppAuth root folder

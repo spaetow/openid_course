@@ -35,7 +35,7 @@ class RPServer(object):
 
 
 def main():
-    cherrypy.server.socket_host = "0.0.0.0"
+    cherrypy.server.socket_host = "localhost"
     cherrypy.server.socket_port = 8090
 
     conf = {

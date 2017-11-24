@@ -66,15 +66,15 @@ public class Client {
 
         // DONE register with the provider using the clientMetadata
         // Uncomment for dynamic registration
-        /*OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(
+        OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(
                 providerMetadata.getRegistrationEndpointURI(), clientMetadata, null);
         HTTPResponse regHTTPResponse = registrationRequest.toHTTPRequest().send();
         ClientRegistrationResponse registrationResponse = OIDCClientRegistrationResponseParser.parse(regHTTPResponse);
-        clientInformation = ((OIDCClientInformationResponse) registrationResponse).getOIDCClientInformation();*/
+        clientInformation = ((OIDCClientInformationResponse) registrationResponse).getOIDCClientInformation();
 
         // Uncomment this for static registration
-        clientInformation = new OIDCClientInformation(new ClientID("dpLXCIQRjADs"), new Date(), clientMetadata,
-                new Secret("33c50b922fe04eaa86625f784e609c3908007c179473f0dc504732b3"));
+//        clientInformation = new OIDCClientInformation(new ClientID("dpLXCIQRjADs"), new Date(), clientMetadata,
+//                new Secret("33c50b922fe04eaa86625f784e609c3908007c179473f0dc504732b3"));
     }
 
     public String authenticate(Request req, Response res)
@@ -253,15 +253,13 @@ public class Client {
             ErrorObject error = ((UserInfoErrorResponse) userInfoResponse).getErrorObject();
             throw new IOException("Received error response: " + error.toString());
         }
-
         // DONE set the appropriate values
-
         return WebServer.successPage(authCode, accessToken, parsedIdToken, idTokenClaims,
                 (UserInfoSuccessResponse) userInfoResponse);
     }
 
     public String implicitFlowCallback(Request req, Response res)
-            throws IOException, URISyntaxException {
+            throws IOException, URISyntaxException, java.text.ParseException {
         // Callback redirect URI
         String url = req.url() + "#" + req.queryParams("url_fragment");
 

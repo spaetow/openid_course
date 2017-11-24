@@ -95,7 +95,7 @@ public class WebServer {
 	public static String successPage(AuthorizationCode authCode,
 			AccessToken accessToken, String idToken,
 			ReadOnlyJWTClaimsSet idTokenClaims,
-			UserInfoSuccessResponse userInfoResponse) throws IOException {
+			UserInfoSuccessResponse userInfoResponse) throws IOException, java.text.ParseException {
 
 		StringBuilder idTokenString = new StringBuilder();
 		idTokenString.append(idTokenClaims.toJSONObject().toJSONString());
@@ -104,13 +104,12 @@ public class WebServer {
 
 		StringBuilder userInfoString = new StringBuilder();
 		if (userInfoResponse != null) {
-			userInfoString.append(userInfoResponse.getUserInfo().toJSONObject()
-					.toJSONString());
-			if (userInfoResponse.getContentType().equals(
-					CommonContentTypes.APPLICATION_JWT)) {
+			if (userInfoResponse.getUserInfo() != null)
+				userInfoString.append(userInfoResponse.getUserInfo().toJSONObject().toJSONString());
+			if (userInfoResponse.getContentType().equals(CommonContentTypes.APPLICATION_JWT)) {
+				userInfoString.append(userInfoResponse.getUserInfoJWT().getJWTClaimsSet().toJSONObject().toJSONString());
 				userInfoString.append("\n");
-				userInfoString.append(userInfoResponse.getUserInfoJWT()
-						.getParsedString());
+				userInfoString.append(userInfoResponse.getUserInfoJWT().getParsedString());
 			}
 		} else {
 			userInfoString.append("null");

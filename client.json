@@ -11,5 +11,6 @@
     "code id_token",
     "code token",
     "code id_token token"
-  ]
+  ],
+  "_userinfo_signed_response_alg": "RS256"
 }

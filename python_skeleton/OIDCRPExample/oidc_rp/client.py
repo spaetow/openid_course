@@ -4,7 +4,7 @@ from pprint import pformat
 
 from oic import rndstr
 from oic.oic import Client as OIDCClient
-from oic.oic.message import AuthorizationResponse
+from oic.oic.message import AuthorizationResponse, RegistrationResponse
 from oic.utils.authn.client import CLIENT_AUTHN_METHOD
 
 __author__ = 'regu0004'
@@ -23,7 +23,15 @@ class Client(object):
         provider_info = self.client.provider_config('https://op1.test.inacademia.org')
 
         # DONE register with the provider using the client_metadata
-        self.client.register(provider_info["registration_endpoint"], **client_metadata)
+        # Uncomment for dynamic registration
+        # self.client.register(provider_info["registration_endpoint"], **client_metadata)
+
+        # Uncomment for static registration (Use code flow)
+        info = {"client_id": "dpLXCIQRjADs",
+                "client_secret": "33c50b922fe04eaa86625f784e609c3908007c179473f0dc504732b3"}
+        client_metadata.update(info)
+        client_reg = RegistrationResponse(**client_metadata)
+        self.client.store_registration_info(client_reg)
 
     def authenticate(self, session):
         # Use the session object to store state between requests

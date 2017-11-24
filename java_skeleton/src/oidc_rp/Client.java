@@ -63,15 +63,16 @@ public class Client {
         providerMetadata = OIDCProviderMetadata.parse(providerInfo);
 
         // DONE register with the provider using the clientMetadata
-        OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(
+        // Uncomment for dynamic registration
+        /*OIDCClientRegistrationRequest registrationRequest = new OIDCClientRegistrationRequest(
                 providerMetadata.getRegistrationEndpointURI(), clientMetadata, null);
         HTTPResponse regHTTPResponse = registrationRequest.toHTTPRequest().send();
-
-        // Parse and check response
         ClientRegistrationResponse registrationResponse = OIDCClientRegistrationResponseParser.parse(regHTTPResponse);
+        clientInformation = ((OIDCClientInformationResponse) registrationResponse).getOIDCClientInformation();*/
 
-        // Store client information from OP
-        clientInformation = ((OIDCClientInformationResponse) registrationResponse).getOIDCClientInformation();
+        // Uncomment this for static registration
+        clientInformation = new OIDCClientInformation(new ClientID("dpLXCIQRjADs"), new Date(), clientMetadata,
+                new Secret("33c50b922fe04eaa86625f784e609c3908007c179473f0dc504732b3"));
     }
 
     public String authenticate(Request req, Response res)

@@ -30,9 +30,8 @@ class Client(object):
         self.client.register(provider_info["registration_endpoint"], **client_metadata)
 
         # Uncomment for static registration (Use code flow)
-        # info = {"client_id": "dpLXCIQRjADs",
-        #         "client_secret": "33c50b922fe04eaa86625f784e609c3908007c179473f0dc504732b3"}
-        # client_metadata.update(info)
+        # client_metadata.update({"client_id": "dpLXCIQRjADs",
+        #                         "client_secret": "33c50b922fe04eaa86625f784e609c3908007c179473f0dc504732b3"})
         # client_reg = RegistrationResponse(**client_metadata)
         # self.client.store_registration_info(client_reg)
 

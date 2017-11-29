@@ -23,7 +23,7 @@ class Client(object):
         provider_info = self.client.provider_config('https://op1.test.inacademia.org')
 
         # Uncomment for signed userinfo
-        client_metadata.update({"userinfo_signed_response_alg": "RS256"})
+        # client_metadata.update({"userinfo_signed_response_alg": "RS256"})
 
         # DONE register with the provider using the client_metadata
         # Uncomment for dynamic registration

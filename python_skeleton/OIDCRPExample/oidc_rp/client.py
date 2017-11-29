@@ -58,9 +58,10 @@ class Client(object):
             # "response_type": ["code", "id_token"],
             # "redirect_uri": self.client.registration_response["redirect_uris"][1],
 
-            "scope": ["email openid"],
+            "scope": ["email openid offline_access"],
             "nonce": session["nonce"],
             "state": session["state"],
+            "prompt": "consent",
 
             # Uncomment to request claims
             # "claims": {
